@@ -1,6 +1,7 @@
 import React, { ComponentPropsWithoutRef, ComponentPropsWithRef, MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
 import type { Controlled as CodeMirror, UnControlled as UnControlledCodeBlock } from 'react-codemirror2';
 import { sampleCode } from './sampleCode';
+import SWC from '@swc/wasm-web';
 
 const DEBOUNCE_MS = 500;
 const codeMirrorOptions: ComponentPropsWithoutRef<typeof CodeMirror>['options'] = {
@@ -26,14 +27,13 @@ export const Repl = () => {
   useEffect(() => {
     async function importAndRunSwcOnMount() {
       try {
-        [swcWasm.current, CodeMirrorLazyImported.current] = await Promise.all([
-          import('@swc/wasm-web'),
+        [CodeMirrorLazyImported.current] = await Promise.all([
           import('react-codemirror2'),
           import('codemirror/mode/javascript/javascript'),
           import('../../../node_modules/codemirror/lib/codemirror.css'),
         ]);
 
-        const importWasm = swcWasm.current.default();
+        const importWasm = SWC();
         await importWasm;
         setLoadingImportsStatus('success');
       } catch (e) {
